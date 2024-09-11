@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stashr">
+    <meta name="author" content="Oli Mebberson">
+    
+    <title>Stashr</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="manifest" href="/manifest.json">   
+    <link rel="icon" href="images/stashr-logo.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>✨ Stashr ✨ <br>Goal Tracker</h1>
+        <div class="goal-section">
+            <input type="text" id="goalName" placeholder="What's your goal? (e.g., Holiday)">
+            <input type="number" id="goalAmount" placeholder="How much is your goal?">
+            <button class="button-3d" onclick="setGoal()">
+                <span class="front">Set Goal</span>
+            </button>
+        </div>
+        <div class="progress-section">
+            <p style="font-size: 19px;">Goal: <span id="displayGoalName"></span></p>
+            <p style="font-size: 19px;">Progress: $<span id="currentSavings">0</span> out of $<span id="displayGoalAmount">0</span></p>
+        </div>
+        <div class="transaction-section">
+            <input type="number" id="depositAmount" placeholder="Deposit">
+            <button class="button-3d" onclick="deposit()">
+                <span class="front">Deposit</span>
+            </button>
+            <input type="number" id="withdrawAmount" placeholder="Withdraw">
+            <button class="button-3d" onclick="withdraw()">
+                <span class="front">Withdraw</span>
+            </button>
+        </div>
+    </div>
+    <div class="history-section">
+        <h3>Transaction History</h3>
+        <p id="history">
+        </p>
+        </div>
+        <button class="button-3d" onclick="resetAll()">
+            <span class="front">Reset</span>
+        </button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

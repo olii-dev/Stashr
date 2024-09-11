@@ -1,0 +1,71 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
+}
+
+.container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+input {
+    margin: 15px;
+    padding: 10px;
+    width: 80%;
+    border-radius: 12px;
+    border: 2px solid black;
+}
+
+.button-3d {
+    background-color: hsl(200deg 100% 50%);
+    color: white;
+    padding: 6px 12px;
+    font-size: 1.25rem;
+    border: 2px solid black;
+    border-radius: 12px;
+    box-shadow: 0 6px hsl(200deg 100% 40%);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.button-3d:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px hsl(200deg 100% 40%);
+}
+
+.history-section {
+    margin-top: 20px;
+}
+
+.transaction-item {
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.transaction-item span {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+
+/* Media query for smaller screens */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .button-3d {
+        padding: 10px 18px;
+        font-size: 1rem;
+    }
+
+    input {
+        padding: 10px;
+        font-size: 1rem;
+    }
+
+    .history-section h3 {
+        font-size: 1.2rem;
+    }
+}
