@@ -1,4 +1,4 @@
-// Function to set goal
+// Set goal
 function setGoal() {
     const goalName = document.getElementById('goalName').value;
     const goalAmount = parseFloat(document.getElementById('goalAmount').value);
@@ -7,13 +7,14 @@ function setGoal() {
         localStorage.setItem('goalName', goalName);
         localStorage.setItem('goalAmount', goalAmount);
         localStorage.setItem('currentSavings', 0);
-        localStorage.setItem('transactions', JSON.stringify([]));  // Initialize empty transaction log
+        localStorage.setItem('transactions', JSON.stringify([]));
         displayGoal();
-        displayHistory();  // Clear transaction history when goal is set
+        displayHistory();
+        hideCreateIfGoalExists();
     }
 }
 
-// Function to display goal and current savings
+// Show goal and current savings
 function displayGoal() {
     const goalName = localStorage.getItem('goalName');
     const goalAmount = localStorage.getItem('goalAmount');
@@ -26,7 +27,7 @@ function displayGoal() {
     }
 }
 
-// Function to deposit money
+// Deposit money
 function deposit() {
     const depositAmount = parseFloat(document.getElementById('depositAmount').value);
     let currentSavings = parseFloat(localStorage.getItem('currentSavings')) || 0;
@@ -34,21 +35,21 @@ function deposit() {
     let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 
     if (!isNaN(depositAmount)) {
-        // Ensure current savings don't exceed the goal amount
+        // Make sure the savings don't pass the goal amount
         const newSavings = Math.min(currentSavings + depositAmount, goalAmount);
         
-        // Add deposit to transaction history
+        // Adds Deposit to transaction history
         transactions.push({ type: 'deposit', amount: depositAmount, date: new Date() });
         localStorage.setItem('transactions', JSON.stringify(transactions));
         
         localStorage.setItem('currentSavings', newSavings);
-        updateProgressStatus(); // Optional: Add an alert when the goal is reached
+        updateProgressStatus();
         displayGoal();
         displayHistory();
     }
 }
 
-// Function to withdraw money
+// Withdraw money
 function withdraw() {
     const withdrawAmount = parseFloat(document.getElementById('withdrawAmount').value);
     let currentSavings = parseFloat(localStorage.getItem('currentSavings')) || 0;
@@ -58,7 +59,6 @@ function withdraw() {
         currentSavings = Math.max(0, currentSavings - withdrawAmount);
         localStorage.setItem('currentSavings', currentSavings);
         
-        // Add withdraw to transaction history
         transactions.push({ type: 'withdraw', amount: withdrawAmount, date: new Date() });
         localStorage.setItem('transactions', JSON.stringify(transactions));
         
@@ -67,10 +67,10 @@ function withdraw() {
     }
 }
 
-// Function to display transaction history
+// Shows transaction history
 function displayHistory() {
     const historySection = document.getElementById('history');
-    historySection.innerHTML = '';  // Clear existing history
+    historySection.innerHTML = '';
 
     let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 
@@ -80,10 +80,10 @@ function displayHistory() {
 
         const icon = document.createElement('span');
         if (transaction.type === 'deposit') {
-            icon.innerHTML = '⬆';  // Green up arrow
+            icon.innerHTML = '⬆';
             icon.style.color = 'green';
         } else {
-            icon.innerHTML = '⬇';  // Red down arrow
+            icon.innerHTML = '⬇';
             icon.style.color = 'red';
         }
 
@@ -99,7 +99,7 @@ function displayHistory() {
     });
 }
 
-// Optional function to notify when goal is reached
+// Let's user know when they reach their goal! (Yay)
 function updateProgressStatus() {
     const currentSavings = parseFloat(localStorage.getItem('currentSavings')) || 0;
     const goalAmount = parseFloat(localStorage.getItem('goalAmount'));
@@ -109,12 +109,13 @@ function updateProgressStatus() {
     }
 }
 
-// RESET
+// Reset
 function resetAll() {
     const confirmation = confirm('Are you sure you want to reset all data? This action cannot be undone.');
 
     if (confirmation) {
         localStorage.clear();
+        showGoalCreate();
         document.getElementById('displayGoalName').innerText = '';
         document.getElementById('displayGoalAmount').innerText = '0';
         document.getElementById('currentSavings').innerText = '0';
@@ -125,8 +126,20 @@ function resetAll() {
     }
 }
 
-// On page load, display goal and history
+function hideCreateIfGoalExists() {
+    const goalName = localStorage.getItem('goalName');
+    if(goalName){
+        document.getElementById("goal-section").style.display = 'none';
+    }
+}
+
+function showGoalCreate() {
+    document.getElementById("goal-section").style.display = 'block';
+    console.log({goalName}, document.getElementsByClassName("goal-section"));
+}
+
 window.onload = function () {
     displayGoal();
+    hideCreateIfGoalExists();
     displayHistory();
 };

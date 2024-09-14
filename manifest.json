@@ -4,7 +4,7 @@
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
-    "theme_color": "#007bff",
+    "theme_color": "#ffffff",
     "icons": [
       {
         "src": "/images/stashr-logo.png",
@@ -17,5 +17,4 @@
         "type": "image/png"
       }
     ]
-  }
-  
+}  
