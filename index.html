@@ -26,14 +26,16 @@
         </div>
         <div class="progress-section">
             <p style="font-size: 19px;">Goal: <span id="displayGoalName"></span></p>
-            <p style="font-size: 19px;">Progress: $<span id="currentSavings">0</span> out of $<span id="displayGoalAmount">0</span></p>
+            <p style="font-size: 19px;">Progress:<br>$<span id="currentSavings">0</span> out of $<span id="displayGoalAmount">0</span></p>
+            <progress id="progressBar" max="100" value="0"></progress>
+            <p id="progressText">0%</p>            
         </div>
         <div class="transaction-section">
-            <input type="number" id="depositAmount" placeholder="Deposit">
+            <input type="number" id="depositAmount" placeholder="Deposit (+)">
             <button class="button-3d" onclick="deposit()">
                 <span class="front">Deposit</span>
             </button>
-            <input type="number" id="withdrawAmount" placeholder="Withdraw">
+            <input type="number" id="withdrawAmount" placeholder="Withdraw (-)">
             <button class="button-3d" onclick="withdraw()">
                 <span class="front">Withdraw</span>
             </button>
@@ -47,6 +49,7 @@
             <span class="front">Reset</span>
         </button>
     </div>
+    <br>
     <script src="script.js"></script>
 </body>
 </html>

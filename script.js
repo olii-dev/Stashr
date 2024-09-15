@@ -24,6 +24,10 @@ function displayGoal() {
         document.getElementById('displayGoalName').innerText = goalName;
         document.getElementById('displayGoalAmount').innerText = goalAmount;
         document.getElementById('currentSavings').innerText = currentSavings;
+
+        const percentage = (currentSavings / goalAmount) * 100;
+        document.getElementById('progressBar').value = percentage;
+        document.getElementById('progressText').innerText = `${percentage.toFixed(1)}%`;
     }
 }
 
@@ -111,15 +115,22 @@ function updateProgressStatus() {
 
 // Reset
 function resetAll() {
-    const confirmation = confirm('Are you sure you want to reset all data? This action cannot be undone.');
+    const confirmation = confirm('Are you sure you want to reset all data? This cannot be undone.');
 
     if (confirmation) {
         localStorage.clear();
         showGoalCreate();
+        document.getElementById('progressBar').value = 0;
+        document.getElementById('progressText').innerText = '';
         document.getElementById('displayGoalName').innerText = '';
         document.getElementById('displayGoalAmount').innerText = '0';
         document.getElementById('currentSavings').innerText = '0';
         document.getElementById('history').innerHTML = '';
+        document.getElementById('goalName').value = '';
+        document.getElementById('goalAmount').value = '';
+        document.getElementById('withdrawAmount').value = '';
+        document.getElementById('depositAmount').value = '';
+        
         alert('All data has been reset.');
     } else {
         alert('Reset cancelled.');
