@@ -17,8 +17,8 @@ function setGoal() {
 // Show goal and current savings
 function displayGoal() {
     const goalName = localStorage.getItem('goalName');
-    const goalAmount = localStorage.getItem('goalAmount');
-    const currentSavings = localStorage.getItem('currentSavings');
+    const goalAmount = parseFloat(localStorage.getItem('goalAmount'));
+    const currentSavings = parseFloat(localStorage.getItem('currentSavings')) || 0;
 
     if (goalName && goalAmount) {
         document.getElementById('displayGoalName').innerText = goalName;
@@ -31,6 +31,10 @@ function displayGoal() {
     }
 }
 
+window.onload = function () {
+    displayGoal();
+    displayHistory();
+};
 // Deposit money
 function deposit() {
     const depositAmount = parseFloat(document.getElementById('depositAmount').value);
@@ -39,10 +43,8 @@ function deposit() {
     let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 
     if (!isNaN(depositAmount)) {
-        // Make sure the savings don't pass the goal amount
         const newSavings = Math.min(currentSavings + depositAmount, goalAmount);
-        
-        // Adds Deposit to transaction history
+
         transactions.push({ type: 'deposit', amount: depositAmount, date: new Date() });
         localStorage.setItem('transactions', JSON.stringify(transactions));
         
@@ -78,7 +80,7 @@ function displayHistory() {
 
     let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 
-    transactions.forEach((transaction) => {
+    transactions.forEach((transaction, index) => {
         const listItem = document.createElement('li');
         listItem.classList.add('transaction-item');
 
@@ -99,6 +101,13 @@ function displayHistory() {
 
         listItem.appendChild(icon);
         listItem.appendChild(text);
+
+        const editButton = document.createElement('button');
+        editButton.classList.add('edit-button');
+        editButton.innerText = 'Edit';
+        editButton.addEventListener('click', () => editTransaction(index));
+        listItem.appendChild(editButton);
+
         historySection.appendChild(listItem);
     });
 }
@@ -154,3 +163,118 @@ window.onload = function () {
     hideCreateIfGoalExists();
     displayHistory();
 };
+
+let previousTransaction = null;
+
+function editTransaction(index) {
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    const transaction = transactions[index];
+
+    previousTransaction = { ...transaction };
+
+    const historySection = document.getElementById('history');
+    const listItem = historySection.children[index];
+
+    listItem.innerHTML = '';
+
+    const icon = document.createElement('span');
+    if (transaction.type === 'deposit') {
+        icon.innerHTML = '⬆';
+        icon.style.color = 'green';
+    } else {
+        icon.innerHTML = '⬇';
+        icon.style.color = 'red';
+    }
+
+    const amountInput = document.createElement('input');
+    amountInput.type = 'number';
+    amountInput.value = transaction.amount;
+
+    const transactionDate = new Date(transaction.date);
+
+    const dateInput = document.createElement('input');
+    dateInput.type = 'date';
+    dateInput.value = transactionDate.toISOString().slice(0, 10);
+
+    listItem.appendChild(icon);
+    listItem.appendChild(amountInput);
+    listItem.appendChild(dateInput);
+
+    const saveButton = document.createElement('button');
+    saveButton.classList.add('edit-button');
+    saveButton.innerText = 'Save';
+    saveButton.addEventListener('click', () => saveTransaction(index, amountInput.value, dateInput.value, transactionDate));
+    listItem.appendChild(saveButton);
+
+    const cancelButton = document.createElement('button');
+    cancelButton.classList.add('undo-button');
+    cancelButton.innerText = 'Cancel';
+    cancelButton.addEventListener('click', () => cancelEdit(index));
+    listItem.appendChild(cancelButton);
+}
+
+function cancelEdit(index) {
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+    transactions[index] = previousTransaction;
+
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+
+    displayGoal();
+    displayHistory();
+}
+
+
+function showUndoButton(index) {
+    const undoButton = document.createElement('button');
+    undoButton.innerText = 'Undo';
+    undoButton.setAttribute('id', 'undoButton');
+    undoButton.addEventListener('click', () => undoTransaction(index));
+
+    document.getElementById('history').appendChild(undoButton);
+}
+
+function undoTransaction(index) {
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+    transactions[index] = previousTransaction;
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+
+    const undoButton = document.getElementById('undoButton');
+    if (undoButton) {
+        undoButton.remove();
+    }
+
+    displayHistory();
+}
+
+function saveTransaction(index, newAmount, newDate, originalDate) {
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+    const originalTime = originalDate.toTimeString().split(' ')[0];
+    const combinedDateTime = new Date(`${newDate}T${originalTime}`);
+    transactions[index].amount = parseFloat(newAmount);
+    transactions[index].date = combinedDateTime.toISOString();
+
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+
+    recalculateSavings();
+    displayHistory();
+}
+
+function recalculateSavings() {
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    let currentSavings = 0;
+
+    transactions.forEach((transaction) => {
+        if (transaction.type === 'deposit') {
+            currentSavings += transaction.amount;
+        } else {
+            currentSavings -= transaction.amount;
+        }
+    });
+
+    localStorage.setItem('currentSavings', currentSavings);
+
+    displayGoal();
+}

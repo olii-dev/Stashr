@@ -48,6 +48,16 @@ input {
     font-weight: bold;
 }
 
+.edit-button, .undo-button {
+    background-color: hsl(200deg 100% 50%);
+    color: white;
+    padding: 3px 6px;
+    font-size: 1.25rem;
+    border: 2px solid black;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-left: 10px
+}
 
 /* Smaller screens */
 @media (max-width: 600px) {
