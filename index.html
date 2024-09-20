@@ -24,12 +24,19 @@
                 display="false">
             </button>
         </div>
-        <div class="progress-section">
-            <p style="font-size: 19px;">Goal: <span id="displayGoalName"></span></p>
-            <p style="font-size: 19px;">Progress:<br>$<span id="currentSavings">0</span> out of $<span id="displayGoalAmount">0</span></p>
-            <progress id="progressBar" max="100" value="0"></progress>
-            <p id="progressText">0%</p>            
-        </div>
+<div class="progress-section">
+    <p style="font-size: 19px;">Goal: 
+        <span id="displayGoalName"></span>
+        <button class="edit-icon" onclick="editGoalName()">🖊</button>
+    </p>
+    <p style="font-size: 19px;">Progress:<br>
+        $<span id="currentSavings">0</span> out of $<span id="displayGoalAmount">0</span>
+        <button class="edit-icon" onclick="editGoalAmount()">🖊</button>
+    </p>
+    <progress id="progressBar" max="100" value="0"></progress>
+    <p id="progressText">0%</p>
+</div>
+
         <div class="transaction-section">
             <input type="number" id="depositAmount" placeholder="Deposit (+)">
             <button class="button-3d" onclick="deposit()">
