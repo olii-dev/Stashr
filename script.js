@@ -356,3 +356,30 @@ function deleteTransaction(index) {
     displayGoal();
     displayHistory();
 }
+
+// Toggle Dark Mode with Persistence
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+
+    // Update the button text
+    const currentMode = document.body.classList.contains('dark-mode') ? '🔆' : '🌙';
+    document.getElementById('dark-mode-toggle').innerText = currentMode;
+
+    // Save the current mode to localStorage
+    const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+    localStorage.setItem('theme', theme);
+}
+
+// Check and Apply Theme on Page Load
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('dark-mode-toggle').innerText = '🔆';
+    } else {
+        document.getElementById('dark-mode-toggle').innerText = '🌙';
+    }
+
+    // Attach the toggleDarkMode function to the button
+    document.getElementById('dark-mode-toggle').addEventListener('click', toggleDarkMode);
+});
