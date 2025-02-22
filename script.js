@@ -1,11 +1,14 @@
 // Set goal
+// Set goal
 function setGoal() {
     const goalName = document.getElementById('goalName').value;
     const goalAmount = parseFloat(document.getElementById('goalAmount').value);
+    const goalDate = document.getElementById('goalDate').value;
 
-    if (goalName && !isNaN(goalAmount)) {
+    if (goalName && !isNaN(goalAmount) && goalDate) {
         localStorage.setItem('goalName', goalName);
         localStorage.setItem('goalAmount', goalAmount);
+        localStorage.setItem('goalDate', goalDate);
         localStorage.setItem('currentSavings', 0);
         localStorage.setItem('transactions', JSON.stringify([]));
         displayGoal();
@@ -18,16 +21,114 @@ function setGoal() {
 function displayGoal() {
     const goalName = localStorage.getItem('goalName');
     const goalAmount = parseFloat(localStorage.getItem('goalAmount'));
+    const goalDate = localStorage.getItem('goalDate');
     const currentSavings = parseFloat(localStorage.getItem('currentSavings')) || 0;
 
-    if (goalName && goalAmount) {
+    if (goalName && goalAmount && goalDate) {
         document.getElementById('displayGoalName').innerText = goalName;
         document.getElementById('displayGoalAmount').innerText = goalAmount;
+        document.getElementById('displayGoalDate').innerText = new Date(goalDate).toLocaleDateString();
         document.getElementById('currentSavings').innerText = currentSavings;
 
         const percentage = (currentSavings / goalAmount) * 100;
         document.getElementById('progressBar').value = percentage;
         document.getElementById('progressText').innerText = `${percentage.toFixed(1)}%`;
+
+        // Calculate and display the remaining amount
+        const remaining = goalAmount - currentSavings;
+        document.getElementById('remainingAmount').innerText = remaining.toFixed(2);
+
+        // Calculate and display the remaining days
+        const today = new Date();
+        const targetDate = new Date(goalDate);
+        const timeDiff = targetDate - today;
+        const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        document.getElementById('daysRemaining').innerText = daysRemaining > 0 ? daysRemaining : 0;
+    }
+}
+
+// Edit goal amount
+function editGoalAmount() {
+    const goalAmount = parseFloat(localStorage.getItem('goalAmount'));
+
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.value = goalAmount;
+
+    const displayGoalAmount = document.getElementById('displayGoalAmount');
+    displayGoalAmount.innerHTML = '';
+    displayGoalAmount.appendChild(input);
+
+    const saveButton = document.createElement('button');
+    saveButton.innerText = 'Save';
+    saveButton.classList.add('edit-button');
+
+    saveButton.onclick = function () {
+        const newGoalAmount = parseFloat(input.value);
+        localStorage.setItem('goalAmount', newGoalAmount);
+        displayGoal();
+        progressBar();
+    };
+
+    displayGoalAmount.appendChild(saveButton);
+}
+
+// Edit goal date
+function editGoalDate() {
+    const goalDate = localStorage.getItem('goalDate');
+
+    const input = document.createElement('input');
+    input.type = 'date';
+    input.value = goalDate;
+
+    const displayGoalDate = document.getElementById('displayGoalDate');
+    displayGoalDate.innerHTML = '';
+    displayGoalDate.appendChild(input);
+
+    const saveButton = document.createElement('button');
+    saveButton.innerText = 'Save';
+    saveButton.classList.add('edit-button');
+
+    saveButton.onclick = function () {
+        const newGoalDate = input.value;
+        localStorage.setItem('goalDate', newGoalDate);
+        displayGoal();
+    };
+
+    displayGoalDate.appendChild(saveButton);
+}
+
+// Show goal and current savings
+function displayGoal() {
+    const goalName = localStorage.getItem('goalName');
+    const goalAmount = parseFloat(localStorage.getItem('goalAmount'));
+    const goalDate = localStorage.getItem('goalDate');
+    const currentSavings = parseFloat(localStorage.getItem('currentSavings')) || 0;
+
+    if (goalName && goalAmount && goalDate) {
+        document.getElementById('displayGoalName').innerText = goalName;
+        document.getElementById('displayGoalAmount').innerText = goalAmount;
+
+        // Format the goal date as day/month/year
+        const targetDate = new Date(goalDate);
+        const formattedDate = `${targetDate.getDate().toString().padStart(2, '0')}/${(targetDate.getMonth() + 1).toString().padStart(2, '0')}/${targetDate.getFullYear()}`;
+        document.getElementById('displayGoalDate').innerText = formattedDate;
+
+        document.getElementById('currentSavings').innerText = currentSavings;
+
+        const percentage = (currentSavings / goalAmount) * 100;
+        document.getElementById('progressBar').value = percentage;
+        document.getElementById('progressText').innerText = `${percentage.toFixed(1)}%`;
+
+        // Calculate and display the remaining amount
+        const remaining = goalAmount - currentSavings;
+        document.getElementById('remainingAmount').innerText = remaining.toFixed(2);
+
+        // Calculate and display the remaining days
+        const today = new Date();
+        const timeDiff = targetDate - today;
+        const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        document.getElementById('daysRemaining').innerText = daysRemaining > 0 ? daysRemaining : 0;
     }
 }
 
@@ -310,21 +411,46 @@ function editGoalName() {
     displayGoalName.appendChild(saveButton);
 }
 
-function editGoalAmount() {
-    const goalAmount = parseFloat(localStorage.getItem('goalAmount'));
-    
+// Edit goal date
+function editGoalDate() {
+    const goalDate = localStorage.getItem('goalDate');
+
     const input = document.createElement('input');
-    input.type = 'number';
-    input.value = goalAmount;
-    
-    const displayGoalAmount = document.getElementById('displayGoalAmount');
-    displayGoalAmount.innerHTML = '';
-    displayGoalAmount.appendChild(input);
-    
+    input.type = 'date';
+    input.value = goalDate;
+
+    const displayGoalDate = document.getElementById('displayGoalDate');
+    displayGoalDate.innerHTML = '';
+    displayGoalDate.appendChild(input);
+
     const saveButton = document.createElement('button');
     saveButton.innerText = 'Save';
     saveButton.classList.add('edit-button');
-    
+
+    saveButton.onclick = function () {
+        const newGoalDate = input.value;
+        localStorage.setItem('goalDate', newGoalDate);
+        displayGoal();
+    };
+
+    displayGoalDate.appendChild(saveButton);
+}
+
+function editGoalAmount() {
+    const goalAmount = parseFloat(localStorage.getItem('goalAmount'));
+
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.value = goalAmount;
+
+    const displayGoalAmount = document.getElementById('displayGoalAmount');
+    displayGoalAmount.innerHTML = '';
+    displayGoalAmount.appendChild(input);
+
+    const saveButton = document.createElement('button');
+    saveButton.innerText = 'Save';
+    saveButton.classList.add('edit-button');
+
     saveButton.onclick = function () {
         const newGoalAmount = parseFloat(input.value);
         localStorage.setItem('goalAmount', newGoalAmount);

@@ -19,24 +19,26 @@
         <div class="goal-section" id="goal-section">
             <input type="text" id="goalName" placeholder="What's your goal? (e.g., Holiday)">
             <input type="number" id="goalAmount" placeholder="How much is your goal?">
+            <input type="date" id="goalDate" placeholder="Target Date">
             <button class="button-3d" onclick="setGoal()">
                 <span class="front">Set Goal</span>
-                <if id="goalName"
-                display="false">
             </button>
         </div>
-<div class="progress-section">
-    <p style="font-size: 19px;">Goal: 
-        <span id="displayGoalName"></span>
-        <button class="edit-icon" onclick="editGoalName()">🖊</button>
-    </p>
-    <p style="font-size: 19px;">Progress:<br>
-        $<span id="currentSavings">0</span> out of $<span id="displayGoalAmount">0</span>
-        <button class="edit-icon" onclick="editGoalAmount()">🖊</button>
-    </p>
-    <progress id="progressBar" max="100" value="0"></progress>
-    <p id="progressText">0%</p>
-</div>
+        <div class="progress-section">
+            <p style="font-size: 19px;">Goal:
+                <span id="displayGoalName"></span>
+                <button class="edit-icon" onclick="editGoalName()">🖊</button>
+            </p>
+            <p style="font-size: 19px;">Progress:<br>
+                $<span id="currentSavings">0</span> out of $<span id="displayGoalAmount">0</span>
+                <button class="edit-icon" onclick="editGoalAmount()">🖊</button>
+            </p>
+            <p style="font-size: 19px;">Remaining: $<span id="remainingAmount">0</span></p>
+            <p style="font-size: 19px;">Target Date: <span id="displayGoalDate"></span></p>
+            <p style="font-size: 19px;">Days Remaining: <span id="daysRemaining">0</span></p>
+            <progress id="progressBar" max="100" value="0"></progress>
+            <p id="progressText">0%</p>
+        </div>               
 
         <div class="transaction-section">
             <input type="number" id="depositAmount" placeholder="Deposit (+)">
