@@ -1,15 +1,67 @@
+:root{
+    --bg: #ffffff;
+    --text: #000000;
+    --card-bg: #ffffff;
+    --input-bg: #ffffff;
+    --input-border: #000000;
+    --muted-bg: rgba(0,0,0,0.03);
+    --button-bg: hsl(200deg 100% 50%);
+    --button-shadow: hsl(200deg 100% 40%);
+}
+
 body {
     font-family: 'Roboto', sans-serif;
     text-align: center;
-    background-color: white;
-    color: black;
+    background-color: var(--bg);
+    color: var(--text);
     transition: all 0.3s ease;
 }
 
-.container {
-    max-width: 400px;
-    margin: 0 auto;
+.app {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
     padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px; /* narrower on desktop for better readability */
+    margin: 0 auto;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+/* layout grid for desktop: left sticky card + scrollable right column */
+.layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 24px;
+    align-items: start;
+}
+
+.left-card {
+    position: sticky;
+    top: 20px;
+    align-self: start;
+    background: var(--card-bg);
+    padding: 18px;
+    border-radius: 12px;
+    box-shadow: 0 6px rgba(0,0,0,0.06);
+}
+
+.right-column {
+    max-height: calc(100vh - 60px);
+    overflow: auto;
+    padding-right: 6px;
+}
+
+.progress-section, .goal-section, .transaction-section {
+    margin-bottom: 16px;
+}
+
+.history-section {
+    margin-top: 0; /* move up as left card is sticky */
 }
 
 input {
@@ -17,17 +69,19 @@ input {
     padding: 10px;
     width: 80%;
     border-radius: 12px;
-    border: 2px solid black;
+    border: 2px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text);
 }
 
 .button-3d {
-    background-color: hsl(200deg 100% 50%);
+    background-color: var(--button-bg);
     color: white;
     padding: 6px 12px;
     font-size: 1.25rem;
-    border: 2px solid black;
+    border: 2px solid rgba(0,0,0,0.2);
     border-radius: 12px;
-    box-shadow: 0 6px hsl(200deg 100% 40%);
+    box-shadow: 0 6px var(--button-shadow);
     cursor: pointer;
     transition: all 0.2s ease-in-out;
 }
@@ -39,6 +93,33 @@ input {
 
 .history-section {
     margin-top: 20px;
+}
+
+.history-controls {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 540px;
+    text-align: left;
+}
+
+.history-list .transaction-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--muted-bg);
+    margin-bottom: 8px;
 }
 
 .transaction-item {
@@ -71,24 +152,15 @@ input {
 }
 
 /* Dark Mode Styles */
-body.dark-mode {
-    background-color: #121212;
-    color: white;
-}
-
-body.dark-mode .container {
-    background-color: #121212;
-}
-
-body.dark-mode input {
-    background-color: #333;
-    color: white;
-    border-color: #555;
-}
-
-body.dark-mode .button-3d {
-    background-color: hsl(200deg 100% 40%);
-    box-shadow: 0 6px hsl(200deg 100% 30%);
+body.dark-mode{
+    --bg: #121212;
+    --text: #ffffff;
+    --card-bg: #1e1e1e;
+    --input-bg: #222;
+    --input-border: #444;
+    --muted-bg: rgba(255,255,255,0.03);
+    --button-bg: hsl(200deg 100% 40%);
+    --button-shadow: hsl(200deg 100% 30%);
 }
 
 /* Smaller screens */
@@ -109,5 +181,24 @@ body.dark-mode .button-3d {
 
     .history-section h3 {
         font-size: 1.2rem;
+    }
+}
+
+/* For medium widths we stack columns for better fit */
+@media (max-width: 900px) {
+    .layout-grid {
+        grid-template-columns: 1fr;
+    }
+    .right-column {
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
+    }
+    .left-card {
+        position: relative;
+        top: auto;
+        box-shadow: none;
+        background: transparent;
+        padding: 0;
     }
 }

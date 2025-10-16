@@ -25,6 +25,10 @@ Stashr is a goal-tracking web app that helps you manage your savings. It allows 
         You can edit the amount or date of any transaction. The time is preserved automatically, and only the date is editable.
     Reset the Goal:
         Reset everything to clear all data and start fresh with a new goal.
+    Export/Import: 
+        Export your entire stash to a JSON file or import a previously exported file to restore data.
+    Search History:
+        Quickly search transaction history by amount, type (deposit/withdraw) or date/time.
 
 ### Developed With:
 

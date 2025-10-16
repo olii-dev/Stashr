@@ -1,50 +1,55 @@
 // Set goal
-// Set goal
 function setGoal() {
-    const goalName = document.getElementById('goalName').value;
+    const goalName = document.getElementById('goalName').value.trim();
     const goalAmount = parseFloat(document.getElementById('goalAmount').value);
     const goalDate = document.getElementById('goalDate').value;
 
-    if (goalName && !isNaN(goalAmount) && goalDate) {
+    if (goalName && !isNaN(goalAmount) && goalAmount > 0 && goalDate) {
         localStorage.setItem('goalName', goalName);
-        localStorage.setItem('goalAmount', goalAmount);
+        localStorage.setItem('goalAmount', goalAmount.toString());
         localStorage.setItem('goalDate', goalDate);
-        localStorage.setItem('currentSavings', 0);
+        localStorage.setItem('currentSavings', '0');
         localStorage.setItem('transactions', JSON.stringify([]));
         displayGoal();
         displayHistory();
         hideCreateIfGoalExists();
+    } else {
+        alert('Please enter a valid goal name, positive amount and target date.');
     }
 }
 
 // Show goal and current savings
 function displayGoal() {
     const goalName = localStorage.getItem('goalName');
-    const goalAmount = parseFloat(localStorage.getItem('goalAmount'));
+    const goalAmount = parseFloat(localStorage.getItem('goalAmount')) || 0;
     const goalDate = localStorage.getItem('goalDate');
     const currentSavings = parseFloat(localStorage.getItem('currentSavings')) || 0;
 
-    if (goalName && goalAmount && goalDate) {
-        document.getElementById('displayGoalName').innerText = goalName;
-        document.getElementById('displayGoalAmount').innerText = goalAmount;
-        document.getElementById('displayGoalDate').innerText = new Date(goalDate).toLocaleDateString();
-        document.getElementById('currentSavings').innerText = currentSavings;
+    document.getElementById('displayGoalName').innerText = goalName || '';
+    document.getElementById('displayGoalAmount').innerText = goalAmount || 0;
+    document.getElementById('currentSavings').innerText = currentSavings.toFixed(2);
 
-        const percentage = (currentSavings / goalAmount) * 100;
-        document.getElementById('progressBar').value = percentage;
-        document.getElementById('progressText').innerText = `${percentage.toFixed(1)}%`;
-
-        // Calculate and display the remaining amount
-        const remaining = goalAmount - currentSavings;
-        document.getElementById('remainingAmount').innerText = remaining.toFixed(2);
-
-        // Calculate and display the remaining days
-        const today = new Date();
+    if (goalDate) {
         const targetDate = new Date(goalDate);
+        const formattedDate = `${targetDate.getDate().toString().padStart(2, '0')}/${(targetDate.getMonth() + 1).toString().padStart(2, '0')}/${targetDate.getFullYear()}`;
+        document.getElementById('displayGoalDate').innerText = formattedDate;
+
+        const today = new Date();
         const timeDiff = targetDate - today;
         const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
         document.getElementById('daysRemaining').innerText = daysRemaining > 0 ? daysRemaining : 0;
+    } else {
+        document.getElementById('displayGoalDate').innerText = '';
+        document.getElementById('daysRemaining').innerText = '';
     }
+
+    const percentage = goalAmount > 0 ? (currentSavings / goalAmount) * 100 : 0;
+    document.getElementById('progressBar').max = 100;
+    document.getElementById('progressBar').value = Math.min(100, percentage);
+    document.getElementById('progressText').innerText = `${Math.min(100, percentage).toFixed(1)}%`;
+
+    const remaining = goalAmount - currentSavings;
+    document.getElementById('remainingAmount').innerText = remaining > 0 ? remaining.toFixed(2) : '0.00';
 }
 
 // Edit goal amount
@@ -98,44 +103,31 @@ function editGoalDate() {
     displayGoalDate.appendChild(saveButton);
 }
 
-// Show goal and current savings
-function displayGoal() {
-    const goalName = localStorage.getItem('goalName');
-    const goalAmount = parseFloat(localStorage.getItem('goalAmount'));
-    const goalDate = localStorage.getItem('goalDate');
-    const currentSavings = parseFloat(localStorage.getItem('currentSavings')) || 0;
+/* Duplicate displayGoal removed — consolidated function above. */
 
-    if (goalName && goalAmount && goalDate) {
-        document.getElementById('displayGoalName').innerText = goalName;
-        document.getElementById('displayGoalAmount').innerText = goalAmount;
-
-        // Format the goal date as day/month/year
-        const targetDate = new Date(goalDate);
-        const formattedDate = `${targetDate.getDate().toString().padStart(2, '0')}/${(targetDate.getMonth() + 1).toString().padStart(2, '0')}/${targetDate.getFullYear()}`;
-        document.getElementById('displayGoalDate').innerText = formattedDate;
-
-        document.getElementById('currentSavings').innerText = currentSavings;
-
-        const percentage = (currentSavings / goalAmount) * 100;
-        document.getElementById('progressBar').value = percentage;
-        document.getElementById('progressText').innerText = `${percentage.toFixed(1)}%`;
-
-        // Calculate and display the remaining amount
-        const remaining = goalAmount - currentSavings;
-        document.getElementById('remainingAmount').innerText = remaining.toFixed(2);
-
-        // Calculate and display the remaining days
-        const today = new Date();
-        const timeDiff = targetDate - today;
-        const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-        document.getElementById('daysRemaining').innerText = daysRemaining > 0 ? daysRemaining : 0;
-    }
-}
-
-window.onload = function () {
+// Initialize on load
+function init() {
     displayGoal();
+    hideCreateIfGoalExists();
     displayHistory();
-};
+
+    // No history search - removed per user request
+
+    // Export / Import
+    const exportBtn = document.getElementById('exportBtn');
+    const importBtn = document.getElementById('importBtn');
+    const importFile = document.getElementById('importFile');
+
+    if (exportBtn) exportBtn.addEventListener('click', exportData);
+    if (importBtn) importBtn.addEventListener('click', () => importFile.click());
+    if (importFile) importFile.addEventListener('change', handleImportFile);
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'd') document.getElementById('depositAmount').focus();
+        if (e.key === 'w') document.getElementById('withdrawAmount').focus();
+    });
+}
 // Deposit money
 function deposit() {
     const depositAmount = parseFloat(document.getElementById('depositAmount').value);
@@ -144,15 +136,16 @@ function deposit() {
     let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 
     if (!isNaN(depositAmount)) {
-        const newSavings = Math.min(currentSavings + depositAmount, goalAmount);
+        const newSavings = isFinite(goalAmount) && !isNaN(goalAmount) ? Math.min(currentSavings + depositAmount, goalAmount) : currentSavings + depositAmount;
 
-        transactions.push({ type: 'deposit', amount: depositAmount, date: new Date() });
+        transactions.push({ type: 'deposit', amount: depositAmount, date: new Date().toISOString() });
         localStorage.setItem('transactions', JSON.stringify(transactions));
-        
-        localStorage.setItem('currentSavings', newSavings);
+
+        localStorage.setItem('currentSavings', newSavings.toString());
         updateProgressStatus();
         displayGoal();
         displayHistory();
+        document.getElementById('depositAmount').value = '';
     }
 }
 
@@ -164,13 +157,14 @@ function withdraw() {
 
     if (!isNaN(withdrawAmount)) {
         currentSavings = Math.max(0, currentSavings - withdrawAmount);
-        localStorage.setItem('currentSavings', currentSavings);
-        
-        transactions.push({ type: 'withdraw', amount: withdrawAmount, date: new Date() });
+        localStorage.setItem('currentSavings', currentSavings.toString());
+
+        transactions.push({ type: 'withdraw', amount: withdrawAmount, date: new Date().toISOString() });
         localStorage.setItem('transactions', JSON.stringify(transactions));
-        
+
         displayGoal();
         displayHistory();
+        document.getElementById('withdrawAmount').value = '';
     }
 }
 
@@ -194,11 +188,10 @@ function displayHistory() {
             icon.style.color = 'red';
         }
 
-        const text = document.createTextNode(
-            `${transaction.type === 'deposit' ? 'Added' : 'Withdrew'} $${transaction.amount} on ${new Date(
-                transaction.date
-            ).toLocaleString()}`
-        );
+        const text = document.createElement('span');
+        text.innerText = `${transaction.type === 'deposit' ? 'Added' : 'Withdrew'} $${parseFloat(transaction.amount).toFixed(2)} on ${new Date(
+            transaction.date
+        ).toLocaleString()}`;
 
         listItem.appendChild(icon);
         listItem.appendChild(text);
@@ -206,6 +199,7 @@ function displayHistory() {
         // Add pen icon for editing
         const editButton = document.createElement('button');
         editButton.classList.add('edit-icon');
+        editButton.setAttribute('aria-label', 'Edit transaction');
         editButton.innerHTML = '🖊';
         editButton.addEventListener('click', () => editTransaction(index));
         listItem.appendChild(editButton);
@@ -260,11 +254,51 @@ function showGoalCreate() {
     console.log({goalName}, document.getElementsByClassName("goal-section"));
 }
 
-window.onload = function () {
-    displayGoal();
-    hideCreateIfGoalExists();
-    displayHistory();
-};
+// Remove window.onload in favor of init() from DOMContentLoaded for consolidated setup
+
+// Export data as JSON file
+function exportData() {
+    const data = {
+        goalName: localStorage.getItem('goalName'),
+        goalAmount: localStorage.getItem('goalAmount'),
+        goalDate: localStorage.getItem('goalDate'),
+        currentSavings: localStorage.getItem('currentSavings'),
+        transactions: JSON.parse(localStorage.getItem('transactions') || '[]')
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'stashr-export.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+}
+
+function handleImportFile(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (ev) {
+        try {
+            const data = JSON.parse(ev.target.result);
+            if (data) {
+                if (data.goalName) localStorage.setItem('goalName', data.goalName);
+                if (data.goalAmount) localStorage.setItem('goalAmount', data.goalAmount);
+                if (data.goalDate) localStorage.setItem('goalDate', data.goalDate);
+                if (data.currentSavings) localStorage.setItem('currentSavings', data.currentSavings);
+                if (Array.isArray(data.transactions)) localStorage.setItem('transactions', JSON.stringify(data.transactions));
+                init();
+                alert('Import successful');
+            }
+        } catch (err) {
+            alert('Failed to import file: ' + err.message);
+        }
+    };
+    reader.readAsText(file);
+}
 
 let previousTransaction = null;
 
@@ -496,16 +530,64 @@ function toggleDarkMode() {
     localStorage.setItem('theme', theme);
 }
 
-// Check and Apply Theme on Page Load
+// Consolidated initialization on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
+    // Apply saved theme
     const savedTheme = localStorage.getItem('theme');
+    // If user has previously set a theme, use it. Otherwise follow OS preference.
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-mode');
-        document.getElementById('dark-mode-toggle').innerText = '🔆';
+        const btn = document.getElementById('dark-mode-toggle');
+        if (btn) btn.innerText = '🔆';
+        localStorage.setItem('themeUserSet', 'true');
+    } else if (savedTheme === 'light') {
+        document.body.classList.remove('dark-mode');
+        const btn = document.getElementById('dark-mode-toggle');
+        if (btn) btn.innerText = '🌙';
+        localStorage.setItem('themeUserSet', 'true');
     } else {
-        document.getElementById('dark-mode-toggle').innerText = '🌙';
+        // detect OS preference
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (prefersDark) {
+            document.body.classList.add('dark-mode');
+            const btn = document.getElementById('dark-mode-toggle');
+            if (btn) btn.innerText = '🔆';
+        } else {
+            document.body.classList.remove('dark-mode');
+            const btn = document.getElementById('dark-mode-toggle');
+            if (btn) btn.innerText = '🌙';
+        }
+        // listen for system theme changes until user sets their own preference
+        if (window.matchMedia) {
+            const mq = window.matchMedia('(prefers-color-scheme: dark)');
+            const systemListener = (e) => {
+                const userSet = localStorage.getItem('themeUserSet');
+                if (userSet === 'true') return; // respect user preference
+                if (e.matches) {
+                    document.body.classList.add('dark-mode');
+                    const btn = document.getElementById('dark-mode-toggle'); if (btn) btn.innerText = '🔆';
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    const btn = document.getElementById('dark-mode-toggle'); if (btn) btn.innerText = '🌙';
+                }
+            };
+            try {
+                mq.addEventListener('change', systemListener);
+            } catch (err) {
+                // Safari older syntax
+                mq.addListener(systemListener);
+            }
+        }
     }
 
     // Attach the toggleDarkMode function to the button
-    document.getElementById('dark-mode-toggle').addEventListener('click', toggleDarkMode);
+    const dmBtn = document.getElementById('dark-mode-toggle');
+    if (dmBtn) dmBtn.addEventListener('click', (e) => {
+        // mark that user explicitly set a preference
+        localStorage.setItem('themeUserSet', 'true');
+        toggleDarkMode(e);
+    });
+
+    // Initialize app
+    init();
 });
